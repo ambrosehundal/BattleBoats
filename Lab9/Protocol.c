@@ -25,6 +25,22 @@ static unsigned char CheckSum(const char *data);
 static uint8_t ASCIIToHex(char character);
 
 // Protocol functions
+int ProtocolEncodeCooMessage(char *message, const GuessData *data) { // "COO,%u,%u"
+    return sprintf(message, PAYLOAD_TEMPLATE_COO, data -> row, data ->col); 
+}
+
+int ProtocolEncodeHitMessage(char *message, const GuessData *data) { // "HIT,%u,%u,%u"
+    return sprintf(message, PAYLOAD_TEMPLATE_HIT, data -> row, data ->col, data ->hit);
+}
+
+int ProtocolEncodeChaMessage(char *message, const NegotiationData *data) { // "CHA,%u,%u"
+    return sprintf(message, PAYLOAD_TEMPLATE_CHA, data ->encryptedGuess, data ->hash);
+}
+
+int ProtocolEncodeDetMessage(char *message, const NegotiationData *data) { // "DET,%u,%u"
+    return sprintf(message, PAYLOAD_TEMPLATE_DET, data ->guess, data ->encryptionKey);
+}
+
 ProtocolParserStatus ProtocolDecode(char in, NegotiationData *nData, GuessData *gData) {
     ParseData data;
     ProtocolParserStatus status;
