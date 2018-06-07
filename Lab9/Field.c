@@ -102,7 +102,6 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
 
     //base case
     if (f->field[row][col] != FIELD_POSITION_EMPTY) {
-        printf("Cannot place boat at these coordinates\n");
         return FALSE;
     }
 
@@ -115,24 +114,18 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         if (dir == FIELD_BOAT_DIRECTION_EAST) {
             for (j = 0; j < boatLength; j++) {
                 if (col >= FIELD_COLS || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
                     return FALSE;
                 } else {
-                    spaces++;
+                    spaces++; //check how many spaces are available for boat
                     col++;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
-
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_SMALL_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
                     c++;
                 }
-                printf("Boat successfully placed!\n");
-
             }
             //reset space value
             spaces = 0;
@@ -142,22 +135,21 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_WEST) {
             for (j = 0; j < boatLength; j++) {
                 if (col < 0 || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     col--;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_SMALL_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
                     c--;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -168,22 +160,22 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_NORTH) {
             for (j = 0; j < boatLength; j++) {
                 if (row < 0 || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     row--;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_SMALL_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     r--;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -191,24 +183,24 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_SOUTH) {
             for (j = 0; j < boatLength; j++) {
                 if (row >= FIELD_ROWS || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     row++;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
 
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
 
                     f->field[r][c] = FIELD_POSITION_SMALL_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     r++;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -221,23 +213,23 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         if (dir == FIELD_BOAT_DIRECTION_EAST) {
             for (j = 0; j < boatLength; j++) {
                 if (col >= FIELD_COLS || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     col++;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
 
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_MEDIUM_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     c++;
                 }
-                printf("Boat successfully placed!\n");
+
 
             }
             //reset space value
@@ -248,22 +240,22 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_WEST) {
             for (j = 0; j < boatLength; j++) {
                 if (col < 0 || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     col--;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_MEDIUM_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     c--;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -274,22 +266,22 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_NORTH) {
             for (j = 0; j < boatLength; j++) {
                 if (row < 0 || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     row--;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_MEDIUM_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     r--;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -297,24 +289,24 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_SOUTH) {
             for (j = 0; j < boatLength; j++) {
                 if (row >= FIELD_ROWS || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     row++;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
 
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
 
                     f->field[r][c] = FIELD_POSITION_MEDIUM_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     r++;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -327,23 +319,22 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         if (dir == FIELD_BOAT_DIRECTION_EAST) {
             for (j = 0; j < boatLength; j++) {
                 if (col >= FIELD_COLS || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     col++;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
 
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_LARGE_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     c++;
                 }
-                printf("Boat successfully placed!\n");
 
             }
             //reset space value
@@ -354,22 +345,22 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_WEST) {
             for (j = 0; j < boatLength; j++) {
                 if (col < 0 || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     col--;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_LARGE_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     c--;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -380,22 +371,22 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_NORTH) {
             for (j = 0; j < boatLength; j++) {
                 if (row < 0 || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     row--;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_LARGE_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     r--;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -403,24 +394,23 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_SOUTH) {
             for (j = 0; j < boatLength; j++) {
                 if (row >= FIELD_ROWS || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     row++;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
 
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
 
                     f->field[r][c] = FIELD_POSITION_LARGE_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     r++;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -433,23 +423,23 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         if (dir == FIELD_BOAT_DIRECTION_EAST) {
             for (j = 0; j < boatLength; j++) {
                 if (col >= FIELD_COLS || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     col++;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
 
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_HUGE_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     c++;
                 }
-                printf("Boat successfully placed!\n");
+
 
             }
             //reset space value
@@ -460,22 +450,22 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_WEST) {
             for (j = 0; j < boatLength; j++) {
                 if (col < 0 || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     col--;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_HUGE_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     c--;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -486,22 +476,22 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_NORTH) {
             for (j = 0; j < boatLength; j++) {
                 if (row < 0 || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     row--;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_HUGE_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     r--;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -509,24 +499,24 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
         else if (dir == FIELD_BOAT_DIRECTION_SOUTH) {
             for (j = 0; j < boatLength; j++) {
                 if (row >= FIELD_ROWS || f->field[row][col] != FIELD_POSITION_EMPTY) {
-                    printf("Boat out of range or another boat already placed\n");
+
                     return FALSE;
                 } else {
                     spaces++;
                     row++;
                 }
             }
-            printf("Total spaces available to place boat: %d\n", spaces);
+
 
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
 
                     f->field[r][c] = FIELD_POSITION_HUGE_BOAT;
                     p = f->field[r][c];
-                    printf("Fieldposition at Field[%d][%d] is: %d\n", r, c, p);
+
                     r++;
                 }
-                printf("Boat successfully placed!\n");
+
             }
             //reset space value
             spaces = 0;
@@ -688,10 +678,11 @@ uint8_t PrintBoat(uint8_t boatStatus) {
 
     while (z > 0) {
         //temp = boatStatus << 1;
-        printf("%u ", boat & 0b1111 ? 1: 0);
-        boat = boat<<1;
-        z>>=1;
+        printf("%u ", boat & 0b1111 ? 1 : 0);
+        boat = boat << 1;
+        z >>= 1;
     }
     return temp;
 
 }
+
