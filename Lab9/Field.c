@@ -83,7 +83,6 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
     int j = 0;
     int i;
     int spaces = 0;
-    FieldPosition p;
     int r = row;
     int c = col;
 
@@ -123,7 +122,7 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_SMALL_BOAT;
-                    p = f->field[r][c];
+
                     c++;
                 }
             }
@@ -146,7 +145,7 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_SMALL_BOAT;
-                    p = f->field[r][c];
+
                     c--;
                 }
 
@@ -171,7 +170,7 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_SMALL_BOAT;
-                    p = f->field[r][c];
+
 
                     r--;
                 }
@@ -196,7 +195,7 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
                 for (i = 0; i < boatLength; i++) {
 
                     f->field[r][c] = FIELD_POSITION_SMALL_BOAT;
-                    p = f->field[r][c];
+
 
                     r++;
                 }
@@ -225,7 +224,7 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_MEDIUM_BOAT;
-                    p = f->field[r][c];
+
 
                     c++;
                 }
@@ -251,8 +250,6 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_MEDIUM_BOAT;
-                    p = f->field[r][c];
-
                     c--;
                 }
 
@@ -277,8 +274,6 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_MEDIUM_BOAT;
-                    p = f->field[r][c];
-
                     r--;
                 }
 
@@ -302,8 +297,6 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
                 for (i = 0; i < boatLength; i++) {
 
                     f->field[r][c] = FIELD_POSITION_MEDIUM_BOAT;
-                    p = f->field[r][c];
-
                     r++;
                 }
 
@@ -331,8 +324,6 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_LARGE_BOAT;
-                    p = f->field[r][c];
-
                     c++;
                 }
 
@@ -356,8 +347,6 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_LARGE_BOAT;
-                    p = f->field[r][c];
-
                     c--;
                 }
 
@@ -382,8 +371,6 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_LARGE_BOAT;
-                    p = f->field[r][c];
-
                     r--;
                 }
 
@@ -406,8 +393,6 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
                 for (i = 0; i < boatLength; i++) {
 
                     f->field[r][c] = FIELD_POSITION_LARGE_BOAT;
-                    p = f->field[r][c];
-
                     r++;
                 }
 
@@ -435,8 +420,6 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
                     f->field[r][c] = FIELD_POSITION_HUGE_BOAT;
-                    p = f->field[r][c];
-
                     c++;
                 }
 
@@ -460,9 +443,7 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
 
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
-                    f->field[r][c] = FIELD_POSITION_HUGE_BOAT;
-                    p = f->field[r][c];
-
+                    f->field[r][c] = FIELD_POSITION_HUGE_BOAT;             
                     c--;
                 }
 
@@ -486,9 +467,7 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
 
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
-                    f->field[r][c] = FIELD_POSITION_HUGE_BOAT;
-                    p = f->field[r][c];
-
+                    f->field[r][c] = FIELD_POSITION_HUGE_BOAT;               
                     r--;
                 }
 
@@ -511,12 +490,9 @@ uint8_t FieldAddBoat(Field *f, uint8_t row, uint8_t col, BoatDirection dir, Boat
             if (spaces == boatLength) {
                 for (i = 0; i < boatLength; i++) {
 
-                    f->field[r][c] = FIELD_POSITION_HUGE_BOAT;
-                    p = f->field[r][c];
-
+                    f->field[r][c] = FIELD_POSITION_HUGE_BOAT;              
                     r++;
                 }
-
             }
             //reset space value
             spaces = 0;
