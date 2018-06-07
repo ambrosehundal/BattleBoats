@@ -20,14 +20,17 @@ typedef struct {
     uint8_t checksum;
 } ParseData;
 
-// Static helper functions
+// Static variables
 static char temp[PROTOCOL_MAX_MESSAGE_LEN];
+
+// Static helper functions
 unsigned char CheckSum(const char *data);
 uint8_t ASCIIToHex(char character);
 
 // Protocol functions
 int ProtocolEncodeCooMessage(char *message, const GuessData *data) { // "COO,%u,%u"
     sprintf(temp, PAYLOAD_TEMPLATE_COO, data -> row, data ->col); 
+    printf("%s\n", temp);
     return sprintf(message, MESSAGE_TEMPLATE, temp, CheckSum(temp));
 }
 
