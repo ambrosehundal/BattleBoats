@@ -31,10 +31,28 @@ int main() {
      * Your code goes in between this comment and the following one with asterisks.
      *****************************************************************************/
     //Testing for AgentInit()
+    int ta = 0;
+    static Field myField;
+    static Field enemyField;
     AgentInit();
+    if(myField.field[0][1] == FIELD_POSITION_EMPTY){
+        printf("Test passed!\n");
+        ta++;
+    }
+    if(enemyField.field[0][1] == FIELD_POSITION_UNKNOWN){
+        printf("Test passed!\n");
+        ta++;
+    }
+    
+    if(ta == 2){
+        printf("AgentInit() tests PASSED %d/2 \n", ta);
+    }
     
     
     
+
+
+
 
     //Testing for AgentGetStatus
     int a = 0, b = 0;
@@ -47,10 +65,10 @@ int main() {
     if (a == 1) {
         printf("AgentGetStatus() tests PASSSED %d/1\n", a);
     }
-    
-    
+
+
     //Testing for AgentGetEnemyStatus()
-    
+
     uint8_t enemylives = AgentGetEnemyStatus();
     if (enemylives == 0) {
         b++;
