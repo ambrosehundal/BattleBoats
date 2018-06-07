@@ -30,7 +30,6 @@ uint8_t ASCIIToHex(char character);
 // Protocol functions
 int ProtocolEncodeCooMessage(char *message, const GuessData *data) { // "COO,%u,%u"
     sprintf(temp, PAYLOAD_TEMPLATE_COO, data -> row, data ->col); 
-    printf("%s\n", temp);
     return sprintf(message, MESSAGE_TEMPLATE, temp, CheckSum(temp));
 }
 
