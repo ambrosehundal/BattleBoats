@@ -27,6 +27,13 @@ static GuessData myGuess;
 static GuessData enemyGuess;
 static AgentEvent event;
 static FieldOledTurn turn;
+//static BoatType type;
+
+static uint8_t r;
+static uint8_t c;
+BoatType direction;
+int success = 0;
+uint8_t small = FALSE, medium = FALSE, large = FALSE, huge = FALSE;
 
 /**
  * The Init() function for an Agent sets up everything necessary for an agent before the game
@@ -39,24 +46,57 @@ void AgentInit(void) {
     FieldInit(&myField, FIELD_POSITION_EMPTY);
     FieldInit(&enemyField, FIELD_POSITION_UNKNOWN);
 
-    uint8_t row = rand() % 6; // random row
-    uint8_t col = rand() % 10; // random column
-    BoatDirection dir = rand() % FIELD_BOAT_DIRECTION_WEST; // random direction
+    while (success < 4) {
+        r = rand() % 6;
+        c = rand() % 10;
+        direction = rand() % FIELD_BOAT_DIRECTION_WEST;
 
-    // My field
-    //int success = 0;
+        if (small == FALSE) {
+            small = FieldAddBoat(&myField, r, c, direction, FIELD_BOAT_SMALL);
+            //check if boat was successfully placed
+            if (small == TRUE) {
+                success++;
+            }
+        }
+        else if (large == FALSE) {
+            large = FieldAddBoat(&myField, r, c, direction, FIELD_BOAT_LARGE);
+            //check if boat was successfully placed
+            if (large == TRUE) {
+                success++;
+            }
+        }
+        else if (medium == FALSE) {
+            medium = FieldAddBoat(&myField, r, c, direction, FIELD_BOAT_MEDIUM);
+            //check if boat was successfully placed
+            if (medium == TRUE) {
+                success++;
+            }
+        }
+        else if (huge == FALSE) {
+            huge = FieldAddBoat(&myField, r, c, direction, FIELD_BOAT_HUGE);
+            //check if boat was successfully placed
+            if (huge == TRUE) {
+                success++;
+            }
+        }
+
+    }
+
+   
 
 
 
 
-    FieldAddBoat(&myField, row, col, dir, FIELD_BOAT_SMALL);
-    FieldAddBoat(&myField, row, col, dir, FIELD_BOAT_MEDIUM);
-    FieldAddBoat(&myField, row, col, dir, FIELD_BOAT_LARGE);
-    FieldAddBoat(&myField, row, col, dir, FIELD_BOAT_HUGE);
+    FieldAddBoat(&myField, r, c, direction, FIELD_BOAT_SMALL);
+    FieldAddBoat(&myField, r, c, direction, FIELD_BOAT_MEDIUM);
+    FieldAddBoat(&myField, r, c, direction, FIELD_BOAT_LARGE);
+    FieldAddBoat(&myField, r, c, direction, FIELD_BOAT_HUGE);
+
+    FieldOledDrawScreen(&myField, &enemyField, turn);
 
 
 
-    // Enemy field
+   
 
 }
 
@@ -82,12 +122,12 @@ int AgentRun(char in, char *outBuffer) {
                 if (ProtocolValidateNegotiationData(&enemyNegotiation) == TRUE) { // If opponent negotiation data is valid
                     if (ProtocolGetTurnOrder(&myNegotiation, &enemyNegotiation) == TURN_ORDER_START) { // If you won turn ordering
                         turn = FIELD_OLED_TURN_MINE;
-                       FieldOledDrawScreen(&myField, &enemyField, turn);
+                        FieldOledDrawScreen(&myField, &enemyField, turn);
                         state = AGENT_STATE_SEND_GUESS;
 
                     } else if (ProtocolGetTurnOrder(&myNegotiation, &enemyNegotiation) == TURN_ORDER_DEFER) { // If you didn't win turn ordering
                         turn = FIELD_OLED_TURN_THEIRS;
-                       FieldOledDrawScreen(&myField, &enemyField, turn);
+                        FieldOledDrawScreen(&myField, &enemyField, turn);
                         state = AGENT_STATE_WAIT_FOR_GUESS;
                     } else { // If turn ordering was a tie
                         OledClear(OLED_COLOR_BLACK);
@@ -114,11 +154,11 @@ int AgentRun(char in, char *outBuffer) {
             if (FieldGetBoatStates(&enemyField) != 0) {
                 FieldUpdateKnowledge(&enemyField, &myGuess);
                 turn = FIELD_OLED_TURN_MINE;
-               FieldOledDrawScreen(&myField, &enemyField, turn);
+                FieldOledDrawScreen(&myField, &enemyField, turn);
                 state = AGENT_STATE_WAIT_FOR_GUESS;
             } else {
                 turn = FIELD_OLED_TURN_MINE;
-               FieldOledDrawScreen(&myField, &enemyField, turn);
+                FieldOledDrawScreen(&myField, &enemyField, turn);
                 state = AGENT_STATE_WON;
             }
             break;
@@ -129,12 +169,12 @@ int AgentRun(char in, char *outBuffer) {
                 if (FieldGetBoatStates(&myField) != 0) {
                     turn = FIELD_OLED_TURN_MINE;
                     FieldRegisterEnemyAttack(&myField, &enemyGuess);
-                   FieldOledDrawScreen(&myField, &enemyField, turn);
+                    FieldOledDrawScreen(&myField, &enemyField, turn);
                     length = ProtocolEncodeHitMessage(outBuffer, &myGuess);
                     state = AGENT_STATE_SEND_GUESS;
                 } else {
                     turn = FIELD_OLED_TURN_MINE;
-                   FieldOledDrawScreen(&myField, &enemyField, turn);
+                    FieldOledDrawScreen(&myField, &enemyField, turn);
                     length = ProtocolEncodeHitMessage(outBuffer, &myGuess);
                     state = AGENT_STATE_LOST;
                 }
@@ -152,3 +192,21 @@ int AgentRun(char in, char *outBuffer) {
     }
     return length;
 }
+
+uint8_t AgentGetStatus(void) {
+    return FieldGetBoatStates(&myField);
+}
+
+/**
+ * This function returns the same data as `AgentCheckState()`, but for the enemy agent.
+ * @return A bitfield indicating the sunk/unsunk status of each ship under the enemy agent's
+ *         control.
+ *
+ * @see Field.h:FieldGetBoatStates()
+ * @see Field.h:BoatStatus
+ */
+uint8_t AgentGetEnemyStatus(void) {
+    return FieldGetBoatStates(&enemyField);
+}
+
+
