@@ -57,22 +57,19 @@ void AgentInit(void) {
             if (small == TRUE) {
                 success++;
             }
-        }
-        else if (large == FALSE) {
+        } else if (large == FALSE) {
             large = FieldAddBoat(&myField, r, c, direction, FIELD_BOAT_LARGE);
             //check if boat was successfully placed
             if (large == TRUE) {
                 success++;
             }
-        }
-        else if (medium == FALSE) {
+        } else if (medium == FALSE) {
             medium = FieldAddBoat(&myField, r, c, direction, FIELD_BOAT_MEDIUM);
             //check if boat was successfully placed
             if (medium == TRUE) {
                 success++;
             }
-        }
-        else if (huge == FALSE) {
+        } else if (huge == FALSE) {
             huge = FieldAddBoat(&myField, r, c, direction, FIELD_BOAT_HUGE);
             //check if boat was successfully placed
             if (huge == TRUE) {
@@ -82,7 +79,7 @@ void AgentInit(void) {
 
     }
 
-   
+
 
 
 
@@ -96,7 +93,6 @@ void AgentInit(void) {
 
 
 
-   
 
 }
 
@@ -106,77 +102,93 @@ int AgentRun(char in, char *outBuffer) {
 
     switch (state) {
         case AGENT_STATE_GENERATE_NEG_DATA:
-            ProtocolGenerateNegotiationData(&myNegotiation); //Generate NegotiationData for my field
-            length = ProtocolEncodeChaMessage(outBuffer, &myNegotiation); // Encodes challenge message and output it to buffer
-            state = AGENT_STATE_SEND_CHALLENGE_DATA;
+            ProtocolGenerateNegotiationData(&myNegotiation); //Generate negotiation data for my field
+            length = ProtocolEncodeChaMessage(outBuffer, &myNegotiation); // Send challenge data
+            state = AGENT_STATE_SEND_CHALLENGE_DATA; // Change state to SEND_DATA
             break;
         case AGENT_STATE_SEND_CHALLENGE_DATA:
-            if (event == AGENT_EVENT_RECEIVED_CHA_MESSAGE) {
-                //  ProtocolDecode(in, enemyNegotiation);
-                length = ProtocolEncodeDetMessage(outBuffer, &myNegotiation);
-                state = AGENT_STATE_DETERMINE_TURN_ORDER;
+            if (event == AGENT_EVENT_RECEIVED_CHA_MESSAGE) { // Once we receive CHA message
+                if (ProtocolDecode(in, &enemyNegotiation, &enemyGuess) == PROTOCOL_PARSING_FAILURE) { // Record opponent data, check if parsing failure
+                    state = AGENT_STATE_INVALID; // Change state to invalid if parsing failure
+                } else { // If message parsing doesn't return fail
+                    length = ProtocolEncodeDetMessage(outBuffer, &myNegotiation); // Send determine data
+                    state = AGENT_STATE_DETERMINE_TURN_ORDER; // Change state to DETERMINE_ORDER
+                }
             }
             break;
         case AGENT_STATE_DETERMINE_TURN_ORDER:
-            if (event == AGENT_EVENT_RECEIVED_DET_MESSAGE) {
-                if (ProtocolValidateNegotiationData(&enemyNegotiation) == TRUE) { // If opponent negotiation data is valid
+            if (event == AGENT_EVENT_RECEIVED_DET_MESSAGE) { // Once we receive DET message
+                if (ProtocolValidateNegotiationData(&enemyNegotiation) == TRUE) { // Validate opponent negotiation data, check if valid
                     if (ProtocolGetTurnOrder(&myNegotiation, &enemyNegotiation) == TURN_ORDER_START) { // If you won turn ordering
-                        turn = FIELD_OLED_TURN_MINE;
+                        turn = FIELD_OLED_TURN_MINE; // Set turn to your turn
                         FieldOledDrawScreen(&myField, &enemyField, turn);
-                        state = AGENT_STATE_SEND_GUESS;
+                        OledUpdate();
+                        state = AGENT_STATE_SEND_GUESS; // Change state to SEND_GUESS
 
-                    } else if (ProtocolGetTurnOrder(&myNegotiation, &enemyNegotiation) == TURN_ORDER_DEFER) { // If you didn't win turn ordering
-                        turn = FIELD_OLED_TURN_THEIRS;
+                    } else if (ProtocolGetTurnOrder(&myNegotiation, &enemyNegotiation) == TURN_ORDER_DEFER) { // If opponent won turn ordering
+                        turn = FIELD_OLED_TURN_THEIRS; // Set turn to their turn
                         FieldOledDrawScreen(&myField, &enemyField, turn);
-                        state = AGENT_STATE_WAIT_FOR_GUESS;
+                        OledUpdate();
+                        state = AGENT_STATE_WAIT_FOR_GUESS; // Changes state to WAIT_FOR_GUESS
                     } else { // If turn ordering was a tie
                         OledClear(OLED_COLOR_BLACK);
+                        OledUpdate();
                         // Set OLED to ERROR_STRING_ORDERING
                     }
                 } else { // If opponent negotiation data is invalid
                     OledClear(OLED_COLOR_BLACK);
                     // Set OLED to ERROR_STRING_ORDERING
-                    state = AGENT_STATE_INVALID;
+                    state = AGENT_STATE_INVALID; // Change state to INVALID
                 }
             }
             break;
         case AGENT_STATE_SEND_GUESS:
-            if (turn == FIELD_OLED_TURN_MINE) {
-                myGuess.row = rand() % 6;
-                myGuess.col = rand() % 10;
-                length = ProtocolEncodeCooMessage(outBuffer, &myGuess);
-                state = AGENT_STATE_WAIT_FOR_HIT;
+            if (turn == FIELD_OLED_TURN_MINE) { // Check if your turn
+                myGuess.row = rand() % 6; // Randomize row
+                myGuess.col = rand() % 10; // Randomize col
+                if (enemyField.field[myGuess.row][myGuess.col] == FIELD_POSITION_UNKNOWN) { // Checks for valid coordinates
+                    length = ProtocolEncodeCooMessage(outBuffer, &myGuess); // Send COO message
+                    state = AGENT_STATE_WAIT_FOR_HIT; // Change state to WAIT_FOR_HIT
+                }
             }
             break;
         case AGENT_STATE_WAIT_FOR_HIT:
-            ProtocolDecode(in, &enemyNegotiation, &enemyGuess); // Not sure whether to store in my data or enemy data
-
-            if (FieldGetBoatStates(&enemyField) != 0) {
-                FieldUpdateKnowledge(&enemyField, &myGuess);
-                turn = FIELD_OLED_TURN_MINE;
-                FieldOledDrawScreen(&myField, &enemyField, turn);
-                state = AGENT_STATE_WAIT_FOR_GUESS;
-            } else {
-                turn = FIELD_OLED_TURN_MINE;
-                FieldOledDrawScreen(&myField, &enemyField, turn);
-                state = AGENT_STATE_WON;
+            if (ProtocolDecode(in, &enemyNegotiation, &enemyGuess) == PROTOCOL_PARSING_FAILURE) { // Record HIT message, check if parsing failure
+                state = AGENT_STATE_INVALID; // Change state to INVALID
+            } else { // If message parsing doesn't return fail
+                if (FieldGetBoatStates(&enemyField) != 0) { // If enemy boats left
+                    FieldUpdateKnowledge(&enemyField, &myGuess);
+                    turn = FIELD_OLED_TURN_MINE; // Set to my turn
+                    FieldOledDrawScreen(&myField, &enemyField, turn);
+                    OledUpdate();
+                    state = AGENT_STATE_WAIT_FOR_GUESS; // Change to WAIT_FOR_GUESS
+                } else { // If no more enemy boats left
+                    turn = FIELD_OLED_TURN_NONE; // Set turn to none
+                    FieldOledDrawScreen(&myField, &enemyField, turn);
+                    OledUpdate();
+                    state = AGENT_STATE_WON; // Change state to won
+                }
             }
             break;
         case AGENT_STATE_WAIT_FOR_GUESS:
-            if (turn == FIELD_OLED_TURN_MINE) {
-                ProtocolDecode(in, &enemyNegotiation, &enemyGuess);
-
-                if (FieldGetBoatStates(&myField) != 0) {
-                    turn = FIELD_OLED_TURN_MINE;
-                    FieldRegisterEnemyAttack(&myField, &enemyGuess);
-                    FieldOledDrawScreen(&myField, &enemyField, turn);
-                    length = ProtocolEncodeHitMessage(outBuffer, &myGuess);
-                    state = AGENT_STATE_SEND_GUESS;
-                } else {
-                    turn = FIELD_OLED_TURN_MINE;
-                    FieldOledDrawScreen(&myField, &enemyField, turn);
-                    length = ProtocolEncodeHitMessage(outBuffer, &myGuess);
-                    state = AGENT_STATE_LOST;
+            if (turn == FIELD_OLED_TURN_THEIRS) { // Check if their turn
+                if (ProtocolDecode(in, &enemyNegotiation, &enemyGuess) == PROTOCOL_PARSING_FAILURE) { // Record COO message, check if parsing failure
+                    state = AGENT_STATE_INVALID; // Change state to INVALID
+                } else { // If message parsing doesn't return fail
+                    if (FieldGetBoatStates(&myField) != 0) { // If friendly boats left
+                        turn = FIELD_OLED_TURN_MINE; // Set turn to my turn
+                        FieldRegisterEnemyAttack(&myField, &enemyGuess); // Register hit
+                        FieldOledDrawScreen(&myField, &enemyField, turn);
+                        OledUpdate();
+                        length = ProtocolEncodeHitMessage(outBuffer, &myGuess); // Send HIT message
+                        state = AGENT_STATE_SEND_GUESS; // Change state to SEND_GUESS
+                    } else { // If no more friendly boats left
+                        turn = FIELD_OLED_TURN_NONE; // Set turn to none
+                        FieldOledDrawScreen(&myField, &enemyField, turn);
+                        OledUpdate();
+                        length = ProtocolEncodeHitMessage(outBuffer, &myGuess); // Send HIT message
+                        state = AGENT_STATE_LOST; // Change state to LOST
+                    }
                 }
             }
             break;
