@@ -21,24 +21,29 @@ typedef struct {
 } ParseData;
 
 // Static helper functions
-static unsigned char CheckSum(const char *data);
-static uint8_t ASCIIToHex(char character);
+static char temp[PROTOCOL_MAX_MESSAGE_LEN];
+unsigned char CheckSum(const char *data);
+uint8_t ASCIIToHex(char character);
 
 // Protocol functions
 int ProtocolEncodeCooMessage(char *message, const GuessData *data) { // "COO,%u,%u"
-    return sprintf(message, PAYLOAD_TEMPLATE_COO, data -> row, data ->col); 
+    sprintf(temp, PAYLOAD_TEMPLATE_COO, data -> row, data ->col); 
+    return sprintf(message, MESSAGE_TEMPLATE, temp, CheckSum(temp));
 }
 
 int ProtocolEncodeHitMessage(char *message, const GuessData *data) { // "HIT,%u,%u,%u"
-    return sprintf(message, PAYLOAD_TEMPLATE_HIT, data -> row, data ->col, data ->hit);
+    sprintf(temp, PAYLOAD_TEMPLATE_HIT, data -> row, data ->col, data ->hit);
+    return sprintf(message, MESSAGE_TEMPLATE, temp, CheckSum(temp));
 }
 
 int ProtocolEncodeChaMessage(char *message, const NegotiationData *data) { // "CHA,%u,%u"
-    return sprintf(message, PAYLOAD_TEMPLATE_CHA, data ->encryptedGuess, data ->hash);
+    sprintf(temp, PAYLOAD_TEMPLATE_CHA, data ->encryptedGuess, data ->hash);
+    return sprintf(message, MESSAGE_TEMPLATE, temp, CheckSum(temp));
 }
 
 int ProtocolEncodeDetMessage(char *message, const NegotiationData *data) { // "DET,%u,%u"
-    return sprintf(message, PAYLOAD_TEMPLATE_DET, data ->guess, data ->encryptionKey);
+    sprintf(temp, PAYLOAD_TEMPLATE_DET, data ->guess, data ->encryptionKey);
+    return sprintf(message, MESSAGE_TEMPLATE, temp, CheckSum(temp));
 }
 
 ProtocolParserStatus ProtocolDecode(char in, NegotiationData *nData, GuessData *gData) {
@@ -135,16 +140,16 @@ ProtocolParserStatus ProtocolDecode(char in, NegotiationData *nData, GuessData *
 }
 
 void ProtocolGenerateNegotiationData(NegotiationData *data) {
-    data->guess = rand() % 0xFFFF; // 2^16, 16 bit number
-    data->encryptionKey = rand() % 0xFFFF; // 2^16, 16 bit number
+    data->guess = rand() % 0xFF; // 16 bit number
+    data->encryptionKey = rand() % 0xFF; // 16 bit number
     
     data->encryptedGuess = data->guess ^ data->encryptionKey;
-    data->hash = (data->encryptedGuess >> 8) ^ data->encryptedGuess;
+    data->hash = (data->guess >> 8) ^ (data->guess) ^ (data->encryptionKey >> 8) ^ (data->encryptionKey);
 }
 
 uint8_t ProtocolValidateNegotiationData(const NegotiationData *data) {
-    uint16_t encryptGuessTest = data->encryptionKey ^ data->guess; // Creates new encryptedGuess
-    uint8_t hashTest = (data->encryptedGuess >> 8) ^ data->encryptedGuess; // Creates new hash
+    uint32_t encryptGuessTest = data->guess ^ data->encryptionKey; // Creates new encryptedGuess
+    uint32_t hashTest = (data->guess >> 8) ^ (data->guess) ^ (data->encryptionKey >> 8) ^ (data->encryptionKey); // Creates new hash
     
     if (encryptGuessTest == data->encryptedGuess && hashTest ==  data->hash) { // Checks if encryptedGuess and hash are the same
         return TRUE;
@@ -156,15 +161,15 @@ uint8_t ProtocolValidateNegotiationData(const NegotiationData *data) {
 
 TurnOrder ProtocolGetTurnOrder(const NegotiationData *myData, const NegotiationData *oppData) {
     TurnOrder order;
-    uint16_t turnOrder = myData ->encryptedGuess ^ oppData->encryptedGuess;
+    uint32_t turnOrder = myData ->encryptionKey ^ oppData->encryptionKey;
     
     int LSB = turnOrder & 1; // Gets the least significant bit
     
-    if (LSB ==1) { // Player with the largest guess goes first
-        if (myData ->encryptedGuess > oppData->encryptedGuess) {
+    if (LSB == 1) { // Player with the largest guess goes first
+        if (myData ->guess > oppData->guess) {
             order = TURN_ORDER_START;
         }
-        else if (myData ->encryptedGuess < oppData->encryptedGuess) {
+        else if (myData ->guess < oppData->guess) {
             order = TURN_ORDER_DEFER;
         }
         else {
@@ -172,10 +177,10 @@ TurnOrder ProtocolGetTurnOrder(const NegotiationData *myData, const NegotiationD
         }
     }
     else if (LSB == 0) { // Player with the smallest guess goes first
-        if (myData ->encryptedGuess < oppData->encryptedGuess) {
+        if (myData ->guess < oppData->guess) {
             order = TURN_ORDER_START;
         }
-        else if (myData ->encryptedGuess > oppData->encryptedGuess) {
+        else if (myData ->guess > oppData->guess) {
             order = TURN_ORDER_DEFER;
         }
         else {
